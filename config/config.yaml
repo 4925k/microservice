@@ -1,4 +1,5 @@
-config:
-  addr: ":8080"
-  cert: "../certs/server.crt"
-  key: "../certs/server.key"
+--- 
+address: ":8080"
+certificate: ../certs/server.crt
+key: ../certs/server.key
+log: ../logging/microservice.log
