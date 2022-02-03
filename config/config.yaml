@@ -1,0 +1,4 @@
+config:
+  addr: ":8080"
+  cert: "../certs/server.crt"
+  key: "../certs/server.key"
