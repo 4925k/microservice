@@ -1,0 +1,11 @@
+services:
+  broker:
+    build:
+      context: ./broker
+      dockerfile: broker.dockerfile
+    restart: always
+    ports:
+      - "9998:9998"
+    deploy:
+      mode: replicated
+      replicas: 1

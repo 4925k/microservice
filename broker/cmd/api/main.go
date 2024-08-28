@@ -14,7 +14,7 @@ type Config struct {
 func main() {
 	app := Config{}
 
-	log.Println("Starting broker server...")
+	log.Printf("Starting broker server on %s\n", webPort)
 
 	// define server
 	srv := http.Server{
