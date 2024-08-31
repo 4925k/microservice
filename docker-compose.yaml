@@ -2,10 +2,41 @@ services:
   broker:
     build:
       context: ./broker
-      dockerfile: broker.dockerfile
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "9998:9998"
     deploy:
       mode: replicated
       replicas: 1
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9997:9997"
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - postgres
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=password dbname=users sslmode=disable"
+
+  postgres:
+    image: 'postgres:14.2'
+    ports:
+      - "5432:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - microservice-db:/var/lib/postgresql/data
+volumes:
+  microservice-db:

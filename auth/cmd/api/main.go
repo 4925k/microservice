@@ -6,6 +6,7 @@ import (
 	"github.com/microservice/auth/data"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	_ "github.com/jackc/pgconn"
@@ -14,7 +15,6 @@ import (
 )
 
 const (
-	dsn     = "host=localhost user=psotgres password=password dbname=user sslmode=disable"
 	webPort = "9997"
 )
 
@@ -74,6 +74,8 @@ func openDB(dsn string) (*sql.DB, error) {
 
 // connectToDB helps to connect to database
 func connectToDB() *sql.DB {
+	dsn := os.Getenv("DSN")
+
 	for {
 		db, err := openDB(dsn)
 		if err != nil {

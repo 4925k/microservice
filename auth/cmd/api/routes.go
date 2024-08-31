@@ -16,5 +16,10 @@ func (app *Config) routes() http.Handler {
 	// health check endpoint
 	mux.Use(middleware.Heartbeat("/ping"))
 
+	mux.Get("/", func(w http.ResponseWriter, e *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("Hello from auth"))
+	})
+
 	return mux
 }
