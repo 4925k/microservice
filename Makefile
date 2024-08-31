@@ -1,6 +1,3 @@
-FRONT_END_BINARY=frontApp
-BROKER_BINARY=brokerApp
-
 ## up: starts all containers in the background without forcing build
 up:
 	@echo "Starting Docker images..."
@@ -8,7 +5,7 @@ up:
 	@echo "Docker images started!"
 
 ## up_build: stops docker-compose (if running), builds all projects and starts docker compose
-up_build: build_broker
+up_build: build_all
 	@echo "Stopping docker images (if running...)"
 	docker-compose down
 	@echo "Building (when required) and starting docker images..."
@@ -21,11 +18,22 @@ down:
 	docker-compose down
 	@echo "Done!"
 
-## build_broker: builds the broker binary as a linux executable
+## build docker images for all services
+build_all: build_broker build_auth
+
 build_broker:
-	@echo "Building broker binary..."
-	cd ../broker-service && env GOOS=linux CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api
+	cd broker && docker build -t microservice-broker .
 	@echo "Done!"
+
+build_auth:
+	cd auth && docker build -t microservice-broker .
+	@echo "Done!"
+
+
+
+
+
+
 
 ## build_front: builds the frone end binary
 build_front:
