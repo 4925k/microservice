@@ -21,5 +21,7 @@ func (app *Config) routes() http.Handler {
 		_, _ = w.Write([]byte("Hello from auth"))
 	})
 
+	mux.Post("/authenticate", app.Authenticate)
+
 	return mux
 }
