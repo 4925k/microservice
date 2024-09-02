@@ -23,7 +23,7 @@ services:
     depends_on:
       - postgres
     environment:
-      DSN: "host=postgres port=5432 user=postgres password=password dbname=users sslmode=disable"
+      DSN: "host=postgres port=5432 user=postgres password=password dbname=postgres sslmode=disable"
 
   postgres:
     image: 'postgres:14.2'

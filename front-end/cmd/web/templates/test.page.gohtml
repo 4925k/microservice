@@ -6,7 +6,8 @@
             <div class="col">
                 <h1 class="mt-5">Test microservices</h1>
                 <hr>
-                <a id="brokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);"> Test Broker</a>
+                <a id="brokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Broker</a>
+                <a id="authBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Auth</a>
 
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
@@ -33,9 +34,44 @@
 {{define "js"}}
     <script>
         let brokenBtn = document.getElementById("brokerBtn")
+        let authBtn = document.getElementById("authBtn")
         let output = document.getElementById("output")
         let sent = document.getElementById("payload")
         let received = document.getElementById("received")
+
+        authBtn.addEventListener("click", function () {
+            const payload = {
+                action: "auth",
+                auth: {
+                    email: "admin@example.com",
+                    password: "verysecret",
+                }
+            }
+
+            const header = new Headers();
+            header.append("Content-Type", "application/json");
+
+            const body = {
+                method: 'POST',
+                headers: header,
+                body: JSON.stringify(payload),
+            }
+
+            fetch("http:\/\/localhost:9998/handle", body)
+                .then((response) => response.json())
+                .then((data) => {
+                    sent.innerHTML = JSON.stringify(payload, undefined, 4);
+                    received.innerHTML = JSON.stringify(data, undefined, 4);
+                    if (data.error) {
+                        output.innerHTML += `<br><strong>Error:</strong> ${data.message}`;
+                    } else {
+                        output.innerHTML += `<br><strong>Response from broker</strong>: ${data.message}`;
+                    }
+                })
+                .catch((error) => {
+                    output.innerHTML += "<br><br>Error: " + error;
+                })
+        })
 
         brokenBtn.addEventListener("click", function () {
             const body = {

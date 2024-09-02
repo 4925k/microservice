@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -24,7 +25,8 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	// get related user from email
 	user, err := app.Models.User.GetByEmail(input.Email)
 	if err != nil {
-		_ = app.writeError(w, r, errors.New("invalid credentials"), http.StatusNotFound)
+		log.Println(err)
+		_ = app.writeError(w, r, errors.New("invalid email"), http.StatusNotFound)
 		return
 	}
 
