@@ -7,14 +7,23 @@ import (
 	"net/http"
 )
 
+// RequestPayload is the type for the request
 type RequestPayload struct {
 	Action string      `json:"action,omitempty"`
 	Auth   AuthPayload `json:"auth,omitempty"`
+	Log    LogPayload  `json:"log,omitempty"`
 }
 
+// AuthPayload is the type for the auth
 type AuthPayload struct {
 	Email    string `json:"email,omitempty"`
 	Password string `json:"password,omitempty"`
+}
+
+// LogPayload is the type for the log
+type LogPayload struct {
+	Name string `json:"name,omitempty"`
+	Data string `json:"data,omitempty"`
 }
 
 // Broker will handle the broker request
@@ -40,6 +49,9 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	switch req.Action {
 	case "auth":
 		app.authenticate(w, req.Auth)
+		return
+	case "logger":
+		app.log(w, req.Log)
 		return
 	default:
 		_ = app.writeError(w, errors.New("action not supported"), http.StatusBadRequest)
@@ -96,5 +108,39 @@ func (app *Config) authenticate(w http.ResponseWriter, data AuthPayload) {
 		Error:   false,
 		Message: "Authenticated",
 		Data:    authResponse.Data,
+	})
+}
+
+// log will log the request
+func (app *Config) log(w http.ResponseWriter, data LogPayload) {
+	// get data
+	jsonData, _ := json.Marshal(data)
+
+	// call the service
+	req, err := http.NewRequest("POST", "http://logger/log", bytes.NewBuffer(jsonData))
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+
+	// get response from auth service
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+	defer res.Body.Close()
+
+	// read status
+	if res.StatusCode != http.StatusAccepted {
+		_ = app.writeError(w, errors.New("error calling logger service"))
+		return
+	}
+
+	// return response
+	_ = app.writeJSON(w, http.StatusOK, serviceResponse{
+		Error:   false,
+		Message: "Logged",
 	})
 }

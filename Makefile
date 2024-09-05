@@ -1,3 +1,8 @@
+FRONT_END_BINARY=frontEnd
+BROKER_BINARY=broker
+AUTH_BINARY=auth
+LOGGER_BINARY=logger
+
 ## up: starts all containers in the background without forcing build
 up:
 	docker-compose down
@@ -20,7 +25,7 @@ down:
 	@echo "Done!"
 
 ## build docker images for all services
-build_all: build_broker build_auth
+build_all: build_broker build_auth build_logger
 
 build_broker:
 	cd broker && docker build -t microservice-broker .
@@ -30,7 +35,9 @@ build_auth:
 	cd auth && docker build -t microservice-auth .
 	@echo "Done!"
 
-
+build_logger:
+	cd logger && docker build -t microservice-logger .
+	@echo "Done!"
 
 
 

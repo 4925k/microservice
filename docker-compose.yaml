@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "80:80"
+      - "8080:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -16,7 +16,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "80:80"
+      - "8081:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -24,6 +24,17 @@ services:
       - postgres
     environment:
       DSN: "host=postgres port=5432 user=postgres password=password dbname=postgres sslmode=disable"
+
+  logger:
+    build:
+      context: ./logger
+      dockerfile: Dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - mongo
 
   postgres:
     image: 'postgres:14.2'
@@ -38,5 +49,21 @@ services:
       POSTGRES_DB: users
     volumes:
       - microservice-db:/var/lib/postgresql/data
+
+  mongo:
+    image: 'mongo:4.2.16-bionic'
+    ports:
+      - "27017:27017"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MONGO_INITDB_DATABASE: users
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo-db:/data/db
+
 volumes:
   microservice-db:
+  mongo-db:
