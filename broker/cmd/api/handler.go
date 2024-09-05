@@ -53,7 +53,7 @@ func (app *Config) authenticate(w http.ResponseWriter, data AuthPayload) {
 	jsonData, _ := json.Marshal(data)
 
 	// call the service
-	req, err := http.NewRequest("POST", "http://auth:9997/authenticate", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", "http://auth/authenticate", bytes.NewBuffer(jsonData))
 	if err != nil {
 		_ = app.writeError(w, err)
 		return

@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "9998:9998"
+      - "80:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -16,7 +16,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "9997:9997"
+      - "80:80"
     deploy:
       mode: replicated
       replicas: 1
