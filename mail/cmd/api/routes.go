@@ -7,20 +7,14 @@ import (
 	"net/http"
 )
 
-// routes for the api
 func (app *Config) routes() http.Handler {
 	mux := chi.NewRouter()
 
+	// allow all for CORS
 	mux.Use(cors.AllowAll().Handler)
 
+	// health check endpoint
 	mux.Use(middleware.Heartbeat("/ping"))
-
-	mux.Post("/log", app.WriteLog)
-
-	mux.Post("/", func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write([]byte("Hello Logger"))
-		return
-	})
 
 	return mux
 }

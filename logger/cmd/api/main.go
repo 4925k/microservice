@@ -15,7 +15,7 @@ import (
 const (
 	webPort  = "80"
 	rpcPort  = "5001"
-	mongoURL = "mongodb://localhost:27017"
+	mongoURL = "mongodb://mongo:27017"
 	grpcPort = "50001"
 )
 
@@ -88,8 +88,17 @@ func connectToMongo() (*mongo.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	log.Println("Connected to MongoDB!")
+
+	log.Println("Pinging to MongoDB!")
+
+	// Ping the database to check connection
+	err = c.Ping(context.TODO(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to ping MongoDB: %w", err)
+	}
+
+	log.Println("Pinging to MongoDB!")
 
 	return c, nil
 }

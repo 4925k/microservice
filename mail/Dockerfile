@@ -6,9 +6,9 @@ COPY . /app
 
 WORKDIR /app
 
-RUN CGO_ENABLED=0 go build -o logger ./cmd/api
+RUN CGO_ENABLED=0 go build -o mail ./cmd/api
 
-RUN chmod +x /app/logger
+RUN chmod +x /app/mail
 
 
 # tiny docker image
@@ -16,6 +16,6 @@ FROM alpine:latest
 
 RUN mkdir /app
 
-COPY --from=builder /app/logger /app
+COPY --from=builder /app/mail /app
 
-CMD [ "/app/logger" ]
+CMD [ "/app/mail" ]

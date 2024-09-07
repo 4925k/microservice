@@ -58,11 +58,18 @@ services:
       mode: replicated
       replicas: 1
     environment:
-      MONGO_INITDB_DATABASE: users
+      MONGO_INITDB_DATABASE: logs
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - mongo-db:/data/db
+
+  mailhog:
+    image: 'mailhog/mailhog:latest'
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 
 volumes:
   microservice-db:

@@ -103,6 +103,13 @@ func (app *Config) authenticate(w http.ResponseWriter, data AuthPayload) {
 		return
 	}
 
+	// log authentication
+	err = app.logRequest(data.Email, data.Password)
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+
 	// return response
 	_ = app.writeJSON(w, http.StatusOK, serviceResponse{
 		Error:   false,
@@ -143,4 +150,36 @@ func (app *Config) log(w http.ResponseWriter, data LogPayload) {
 		Error:   false,
 		Message: "Logged",
 	})
+}
+
+// logRequest will log the given name and data
+func (app *Config) logRequest(name, data string) error {
+	var entry struct {
+		Name string `json:"name"`
+		Data string `json:"data"`
+	}
+
+	entry.Name = name
+	entry.Data = data
+
+	// create json to sent to auth service
+	jsonData, _ := json.Marshal(entry)
+
+	// logger service url
+	logServiceURL := "http://logger/log"
+
+	// create request
+	req, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	// complete request
+	client := &http.Client{}
+	_, err = client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
