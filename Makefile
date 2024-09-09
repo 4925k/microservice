@@ -25,7 +25,7 @@ down:
 	@echo "Done!"
 
 ## build docker images for all services
-build_all: build_broker build_auth build_logger
+build_all: build_broker build_auth build_logger build_mail
 
 build_broker:
 	cd broker && docker build -t microservice-broker .
@@ -39,8 +39,9 @@ build_logger:
 	cd logger && docker build -t microservice-logger .
 	@echo "Done!"
 
-
-
+build_mail:
+	cd mail && docker build -t microservice-mail .
+	@echo "Done!"
 
 
 ## build_front: builds the frone end binary

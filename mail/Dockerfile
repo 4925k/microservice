@@ -12,10 +12,8 @@ RUN chmod +x /app/mail
 
 
 # tiny docker image
-FROM alpine:latest
+FROM scratch
 
-RUN mkdir /app
+COPY --from=builder /app/mail /
 
-COPY --from=builder /app/mail /app
-
-CMD [ "/app/mail" ]
+CMD [ "/mail" ]

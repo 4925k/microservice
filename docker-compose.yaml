@@ -36,6 +36,24 @@ services:
     depends_on:
       - mongo
 
+  mail:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MAIL_DOMAIN: "localhost"
+      MAIL_HOST: "mailhog"
+      MAIL_PORT: "1025"
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_ENCRYPTION: "none"
+      MAIL_SENDER_NAME: "Microservice"
+      MAIL_SENDER_ADDRESS: "microservice@example.com"
+
   postgres:
     image: 'postgres:14.2'
     ports:
@@ -64,11 +82,13 @@ services:
     volumes:
       - mongo-db:/data/db
 
+
   mailhog:
     image: 'mailhog/mailhog:latest'
     ports:
       - "1025:1025"
       - "8025:8025"
+
 
 
 volumes:

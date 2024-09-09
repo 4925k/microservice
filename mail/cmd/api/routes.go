@@ -16,5 +16,8 @@ func (app *Config) routes() http.Handler {
 	// health check endpoint
 	mux.Use(middleware.Heartbeat("/ping"))
 
+	// send mail
+	mux.Post("/send", app.SendMail)
+
 	return mux
 }
