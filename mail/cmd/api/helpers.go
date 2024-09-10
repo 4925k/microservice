@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -63,6 +64,8 @@ func (app *Config) writeJSON(w http.ResponseWriter, status int, data any, header
 
 // writeError will help return errors to client
 func (app *Config) writeError(w http.ResponseWriter, err error, status ...int) error {
+	log.Println(err)
+
 	statusCode := http.StatusBadRequest
 
 	if len(status) > 0 {

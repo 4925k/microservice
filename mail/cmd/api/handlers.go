@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func (app *Config) SendMail(w http.ResponseWriter, r *http.Request) {
+	log.Println("Sending mail")
+
 	// input struct
 	type mailMessage struct {
 		From    string `json:"from"`
