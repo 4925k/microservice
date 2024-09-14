@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/4925k/microservice/broker/event"
 	"net/http"
 )
 
@@ -59,6 +60,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authenticate(w, req.Auth)
 		return
 	case "logger":
+		app.logViaRabbit(w, req.Log)
 		//app.log(w, req.Log) // call directly to the logger service
 		return
 	case "mail":
@@ -232,4 +234,44 @@ func (app *Config) sendMail(w http.ResponseWriter, data MailPayload) {
 	payload.Message = "Message sent to " + data.To
 
 	_ = app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+// logViaRabbit will log data via rabbit
+func (app *Config) logViaRabbit(w http.ResponseWriter, data LogPayload) {
+	err := app.pushToQueue(data.Name, data.Data)
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+
+	var payload serviceResponse
+	payload.Error = false
+	payload.Message = "Logged via RabbitMQ"
+
+	_ = app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+// pushToQueue will push data to queue
+func (app *Config) pushToQueue(name, msg string) error {
+	// connect to rabbit
+	emitter, err := event.NewEmitter(app.Rabbit)
+	if err != nil {
+		return err
+	}
+
+	// prepare payload
+	payload := LogPayload{
+		Name: name,
+		Data: msg,
+	}
+
+	j, _ := json.Marshal(payload)
+
+	// log event
+	err = emitter.Push(string(j), "log.INFO")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
