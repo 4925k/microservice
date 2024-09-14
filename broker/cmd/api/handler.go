@@ -59,7 +59,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authenticate(w, req.Auth)
 		return
 	case "logger":
-		app.log(w, req.Log)
+		//app.log(w, req.Log) // call directly to the logger service
 		return
 	case "mail":
 		app.sendMail(w, req.Mail)
@@ -130,38 +130,38 @@ func (app *Config) authenticate(w http.ResponseWriter, data AuthPayload) {
 }
 
 // log will log the request
-func (app *Config) log(w http.ResponseWriter, data LogPayload) {
-	// get data
-	jsonData, _ := json.Marshal(data)
-
-	// call the service
-	req, err := http.NewRequest("POST", "http://logger/log", bytes.NewBuffer(jsonData))
-	if err != nil {
-		_ = app.writeError(w, err)
-		return
-	}
-
-	// get response from auth service
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		_ = app.writeError(w, err)
-		return
-	}
-	defer res.Body.Close()
-
-	// read status
-	if res.StatusCode != http.StatusAccepted {
-		_ = app.writeError(w, errors.New("error calling logger service"))
-		return
-	}
-
-	// return response
-	_ = app.writeJSON(w, http.StatusOK, serviceResponse{
-		Error:   false,
-		Message: "Logged",
-	})
-}
+//func (app *Config) log(w http.ResponseWriter, data LogPayload) {
+//	// get data
+//	jsonData, _ := json.Marshal(data)
+//
+//	// call the service
+//	req, err := http.NewRequest("POST", "http://logger/log", bytes.NewBuffer(jsonData))
+//	if err != nil {
+//		_ = app.writeError(w, err)
+//		return
+//	}
+//
+//	// get response from auth service
+//	client := &http.Client{}
+//	res, err := client.Do(req)
+//	if err != nil {
+//		_ = app.writeError(w, err)
+//		return
+//	}
+//	defer res.Body.Close()
+//
+//	// read status
+//	if res.StatusCode != http.StatusAccepted {
+//		_ = app.writeError(w, errors.New("error calling logger service"))
+//		return
+//	}
+//
+//	// return response
+//	_ = app.writeJSON(w, http.StatusOK, serviceResponse{
+//		Error:   false,
+//		Message: "Logged",
+//	})
+//}
 
 // logRequest will log the given name and data
 func (app *Config) logRequest(name, data string) error {

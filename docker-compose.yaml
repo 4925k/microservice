@@ -53,6 +53,19 @@ services:
       MAIL_ENCRYPTION: "none"
       MAIL_SENDER_NAME: "Microservice"
       MAIL_SENDER_ADDRESS: "microservice@example.com"
+    depends_on:
+      - mailhog
+
+  listener:
+    build:
+      context: ./listener
+      dockerfile: Dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - rabbitmq
 
   postgres:
     image: 'postgres:14.2'
