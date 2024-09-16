@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/4925k/microservice/broker/event"
 	"net/http"
+	"net/rpc"
 )
 
 // RequestPayload is the type for the request
@@ -60,7 +61,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authenticate(w, req.Auth)
 		return
 	case "logger":
-		app.logViaRabbit(w, req.Log)
+		app.logViaRPC(w, req.Log) // logging via rpc service
+		//app.logViaRabbit(w, req.Log) // log view rabbit mq queue
 		//app.log(w, req.Log) // call directly to the logger service
 		return
 	case "mail":
@@ -274,4 +276,39 @@ func (app *Config) pushToQueue(name, msg string) error {
 	}
 
 	return nil
+}
+
+type RPCPayload struct {
+	Name string
+	Data string
+}
+
+// logViaRPC will log data via RPC
+func (app *Config) logViaRPC(w http.ResponseWriter, data LogPayload) {
+	// connect to rpc
+	client, err := rpc.Dial("tcp", "logger:5001")
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+
+	// prepare payload
+	rpcPayload := RPCPayload{
+		Name: data.Name,
+		Data: data.Data,
+	}
+
+	// call rpc
+	var result string
+	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+
+	// return response
+	_ = app.writeJSON(w, http.StatusAccepted, serviceResponse{
+		Error:   false,
+		Message: "Logged via RPC: " + result,
+	})
 }
