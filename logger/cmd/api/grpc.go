@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/4925k/microservice/logger/data"
 	"github.com/4925k/microservice/logger/logs"
+	"google.golang.org/grpc"
+	"log"
+	"net"
 )
 
 // LogServer is a log server
@@ -33,4 +37,26 @@ func (l LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.Lo
 	res := &logs.LogResponse{Result: "success"}
 
 	return res, nil
+}
+
+// gRPCListen will listen for gRPC
+func (app *Config) gRPCListen() {
+	// listen for gRPC
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
+	if err != nil {
+		log.Fatalf("Failed to listen for gRPC: %v", err)
+	}
+
+	// create new gRPC server
+	s := grpc.NewServer()
+
+	// register service
+	logs.RegisterLogServiceServer(s, &LogServer{Models: app.Models})
+
+	log.Println("gRPC server started on port", grpcPort)
+
+	// start server
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("Failed to listen for gRPC: %v", err)
+	}
 }

@@ -2,11 +2,16 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"github.com/4925k/microservice/broker/event"
+	"github.com/4925k/microservice/broker/logs"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
 	"net/rpc"
+	"time"
 )
 
 // RequestPayload is the type for the request
@@ -310,5 +315,46 @@ func (app *Config) logViaRPC(w http.ResponseWriter, data LogPayload) {
 	_ = app.writeJSON(w, http.StatusAccepted, serviceResponse{
 		Error:   false,
 		Message: "Logged via RPC: " + result,
+	})
+}
+
+// logViaGRPC will log data via gRPC
+func (app *Config) logViaGRPC(w http.ResponseWriter, r *http.Request) {
+
+	// read json
+	var requestPayload RequestPayload
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+
+	// call grpc
+	conn, err := grpc.NewClient("logger:50001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+	defer conn.Close()
+
+	c := logs.NewLogServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	_, err = c.WriteLog(ctx, &logs.LogRequest{
+		LogEntry: &logs.Log{
+			Name: requestPayload.Log.Name,
+			Data: requestPayload.Log.Data,
+		},
+	})
+	if err != nil {
+		_ = app.writeError(w, err)
+		return
+	}
+
+	// return response
+	_ = app.writeJSON(w, http.StatusAccepted, serviceResponse{
+		Error:   false,
+		Message: "Logged via gRPC",
 	})
 }
