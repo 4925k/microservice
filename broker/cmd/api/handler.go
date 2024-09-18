@@ -42,7 +42,7 @@ type LogPayload struct {
 }
 
 // Broker will handle the broker request
-func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
+func (app *Config) Broker(w http.ResponseWriter, _ *http.Request) {
 	data := &serviceResponse{
 		Error:   false,
 		Message: "OK",
