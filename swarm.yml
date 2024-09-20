@@ -1,10 +1,27 @@
 version: "3"
 
 services:
+  caddy:
+    image: 4925k/microservice-caddy
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy:/data
+      - caddy-config:/config
+  fe:
+    image: 4925k/microservice-fe
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      BROKER_URL: "http://backend"
+
   broker:
     image: 4925k/microservice-broker
-    ports:
-      - "8080:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -86,7 +103,9 @@ services:
     volumes:
       - microservice-db:/var/lib/postgresql/data
 
-
 volumes:
   microservice-db:
   mongo-db:
+  caddy:
+    external: true
+  caddy-config:

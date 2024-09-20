@@ -47,6 +47,10 @@ build_listener:
 	cd listener && docker build -t microservice-listener .
 	@echo "Done!"
 
+build_listener:
+	cd front-end && docker build -t microservice-fe .
+	@echo "Done!"
+
 
 ## build_front: builds the frone end binary
 build_front:

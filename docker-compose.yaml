@@ -1,11 +1,19 @@
 services:
+  fe:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8082:8082"
+
   broker:
     build:
       context: ./broker
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "8080:80"
+      - "8080:8080"
     deploy:
       mode: replicated
       replicas: 1
