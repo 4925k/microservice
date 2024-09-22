@@ -17,7 +17,7 @@ type LogServer struct {
 }
 
 // WriteLog will write a log
-func (l LogServer) WriteLog(ctx context.Context, req *logs.LogRequest) (*logs.LogResponse, error) {
+func (l LogServer) WriteLog(_ context.Context, req *logs.LogRequest) (*logs.LogResponse, error) {
 	input := req.GetLogEntry()
 
 	// write the log

@@ -18,7 +18,7 @@ func (app *Config) routes() http.Handler {
 	mux.Post("/log", app.WriteLog)
 
 	mux.Post("/", func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write([]byte("Hello Logger"))
+		_, _ = writer.Write([]byte("Hello Logger"))
 		return
 	})
 
