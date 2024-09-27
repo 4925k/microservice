@@ -23,7 +23,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get related user from email
-	user, err := app.Models.User.GetByEmail(input.Email)
+	user, err := app.Repo.GetByEmail(input.Email)
 	if err != nil {
 		log.Println(err)
 		_ = app.writeError(w, r, errors.New("invalid email"), http.StatusNotFound)
@@ -31,7 +31,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check for correct password
-	valid, err := user.PasswordMatches(input.Password)
+	valid, err := app.Repo.PasswordMatches(input.Password, *user)
 	if err != nil || !valid {
 		_ = app.writeError(w, r, errors.New("invalid credentials"), http.StatusNotFound)
 		return

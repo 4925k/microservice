@@ -23,8 +23,7 @@ var (
 )
 
 type Config struct {
-	DB     *sql.DB
-	Models data.Models
+	Repo data.Repository
 }
 
 func main() {
@@ -37,10 +36,7 @@ func main() {
 	}
 
 	// set up config
-	app := Config{
-		DB:     conn,
-		Models: data.New(conn),
-	}
+	app := Config{}
 
 	// server config
 	srv := http.Server{
@@ -94,4 +90,11 @@ func connectToDB() *sql.DB {
 		time.Sleep(5 * time.Second)
 		continue
 	}
+}
+
+// setupRepo sets up the repository
+func (app *Config) setupRepo(conn *sql.DB) {
+	db := data.NewPostgresRepository(conn)
+
+	app.Repo = &db
 }
